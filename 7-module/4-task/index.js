@@ -9,7 +9,7 @@ export default class StepSlider {
     this.addDragNDrop();
     this.addPointer();
   }
-  
+
   createSlider = () => {
     let slides = [];
     for (let i=0; i<this.steps; i++){
@@ -40,6 +40,9 @@ export default class StepSlider {
 
   addDragNDrop = () => {
     let THUMB = this.elem.querySelector('.slider__thumb');
+    THUMB.ondragstart = (event) => {
+      event.preventDefault();
+    }
 
     THUMB.addEventListener('pointerdown', event => {
       this.elem.classList.add('slider_dragging')
@@ -75,8 +78,9 @@ export default class StepSlider {
       document.addEventListener('pointermove', onMove);
 
       document.addEventListener('pointerup', event => {
+        let val = this.value
         let custEvent = new CustomEvent('slider-change', { 
-          detail: +this.value,
+          detail: +val,
           bubbles: true 
         })
         this.elem.dispatchEvent(custEvent);
@@ -96,11 +100,10 @@ export default class StepSlider {
   }
 
   addPointer = () => {
-    this.elem.addEventListener('click',({layerX}) => {
-      let width = getComputedStyle(this.elem)['width'].slice(0,-2);
-      let value = ((this.steps-1) * layerX / width).toFixed(0);
+    this.elem.addEventListener('click',(event) => {
+      let value = Math.round((event.clientX - this.elem.getBoundingClientRect().left)/ this.elem.offsetWidth * (this.steps-1));
       let sliderValue = this.elem.querySelector('.slider__value');
-      
+
       if (value != +sliderValue.innerHTML){
         let event = new CustomEvent('slider-change', { 
           detail: +value,
@@ -114,7 +117,7 @@ export default class StepSlider {
       let oldActiveSlide = this.elem.querySelector('.slider__step-active');
       oldActiveSlide.classList.remove('slider__step-active');
 
-      let newActiveSlide = [...this.elem.querySelectorAll('.slider__steps span')][value];
+      let newActiveSlide = [...this.elem.querySelectorAll('.slider__steps span')][+value];
       newActiveSlide.classList.add('slider__step-active');
 
       let thumb = this.elem.querySelector('.slider__thumb');

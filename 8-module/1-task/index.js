@@ -2,13 +2,13 @@ import createElement from '../../assets/lib/create-element.js';
 
 export default class CartIcon {
   constructor() {
-    this.render();
+    this.elem = this.render();
 
     this.addEventListeners();
   }
 
   render() {
-    this.elem = createElement('<div class="cart-icon"></div>');
+    return createElement('<div class="cart-icon"></div>');
   }
 
   update(cart) {
